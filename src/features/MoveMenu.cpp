@@ -201,7 +201,8 @@ public:
         m_editorUI->m_editButtonBar->setVisible(false);
 
         // If we're not showing, we don't need to update the menu layout, just return
-        if (!show || alpha::editor_tabs::getCurrentMode() != Ok(alpha::editor_tabs::EDIT)) {
+        auto editMode = alpha::editor_tabs::getMode(alpha::editor_tabs::Edit);
+        if (!show || !editMode || alpha::editor_tabs::getCurrentMode() != editMode) {
             this->setVisible(false);
             return;
         }
