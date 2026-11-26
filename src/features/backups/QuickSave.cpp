@@ -18,7 +18,7 @@ static asp::fs::Path getQuickSaveDir() {
 
 // Autosave is stored separately, as if you press Exit without saving in the 
 // editor then that should discard autosaves too, but not quicksaves
-static std::filesystem::path getAutoSaveDir() {
+static asp::fs::Path getAutoSaveDir() {
     return Mod::get()->getSaveDir() / "autosave";
 }
 
@@ -41,9 +41,8 @@ class $modify(GManager) {
         GManager::save();
         // If we have succesfully saved local levels, we can delete the temp quick save directory
         if (isLLM) {
-            std::error_code ec;
-            std::filesystem::remove_all(getQuickSaveDir(), ec);
-            std::filesystem::remove_all(getAutoSaveDir(), ec);
+            (void)asp::fs::removeDirAll(getQuickSaveDir());
+            (void)asp::fs::removeDirAll(getAutoSaveDir());
         }
 	}
 };
@@ -80,10 +79,8 @@ class $modify(EditorPauseLayer) {
         // Discard autosaves on exit without save
         if (fl->getTag() == 1 && btn2) {
             log::warn("Discarding autosaved changes");
-            std::error_code ec;
-            std::filesystem::remove_all(
-                getAutoSaveDir() / fmt::format("{}.gmd", EditorIDs::getID(m_editorLayer->m_level)),
-                ec
+            (void)asp::fs::remove(
+                getAutoSaveDir() / fmt::format("{}.gmd", EditorIDs::getID(m_editorLayer->m_level))
             );
         }
         EditorPauseLayer::FLAlert_Clicked(fl, btn2);
@@ -128,7 +125,7 @@ class $modify(MenuLayer) {
         return true;
     }
 
-    static void restoreCrashData(std::filesystem::path const& path) {
+    static void restoreCrashData(asp::fs::Path const& path) {
         for (auto file : file::readDirectory(path).unwrapOrDefault()) {
             auto data = gmd::importGmdAsLevel(file);
             if (!data) continue;
