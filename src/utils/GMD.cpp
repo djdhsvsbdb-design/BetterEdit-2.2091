@@ -14,7 +14,7 @@ namespace gmd {
 
         const auto plistTag = "<plist version=\"1.0\">";
         if (const auto pos = data.substr(0, 100).find(plistTag); pos != std::string::npos) {
-            data.replace(pos, plistTag.size(), "<plist version=\"1.0\" gjver=\"2.0\">");
+            data.replace(pos, sizeof("<plist version=\"1.0\">") - 1, "<plist version=\"1.0\" gjver=\"2.0\">");
         }
 
         if (data.starts_with("<?xml version")) {
