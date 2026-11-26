@@ -346,11 +346,13 @@ class $modify(MoreButtonsUI, EditorUI) {
         // Create the custom edit menu
         (void)CustomEditMenu::get(this, true);
 
-        alpha::editor_tabs::addTabSwitchCallback([this](ZStringView) {
-            if (auto menu = CustomEditMenu::get(this)) {
-                menu->updateMenu();
-            }
-        });
+        if (auto editMode = alpha::editor_tabs::getMode(alpha::editor_tabs::Edit)) {
+            m_fields->onModeSwitch = alpha::editor_tabs::Mode::SwitchModeEvent(editMode).listen([this](bool show) {
+                if (auto menu = CustomEditMenu::get(this)) {
+                    menu->updateMenu(show);
+                }
+            });
+        }
 
         return true;
     }
