@@ -32,13 +32,13 @@ void createAutoSave(LevelEditorLayer* lel) {
 static bool SKIP_NEXT_LLM_SAVE = false;
 class $modify(GManager) {
 	$override
-	void save() {
+	void save(bool async) {
         auto isLLM = static_cast<LocalLevelManager*>(static_cast<GManager*>(this)) == LocalLevelManager::get();
 		if (isLLM && SKIP_NEXT_LLM_SAVE) {
             SKIP_NEXT_LLM_SAVE = false;
             return;
 		}
-        GManager::save();
+        GManager::save(async);
         // If we have succesfully saved local levels, we can delete the temp quick save directory
         if (isLLM) {
             (void)asp::fs::removeDirAll(getQuickSaveDir());
