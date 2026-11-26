@@ -4,7 +4,7 @@
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/binding/LocalLevelManager.hpp>
 #include <Geode/binding/FLAlertLayer.hpp>
-#include <cvolton.level-id-api/include/EditorIDs.hpp>
+#include <cvolton.level-id-api/EditorIDs.hpp>
 #include <utils/GMD.hpp>
 #include <utils/HolyUB.hpp>
 #include <utils/Editor.hpp>
