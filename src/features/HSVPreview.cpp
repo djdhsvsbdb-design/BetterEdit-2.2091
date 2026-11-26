@@ -84,8 +84,8 @@ class $modify(CustomizeObjectLayer) {
 };
 class $modify(HSVWidgetPopup) {
     $override
-    bool init(ccHSVValue hsv, HSVWidgetDelegate* delegate, std::string p2) {
-        if (!HSVWidgetPopup::init(hsv, delegate, p2))
+    bool init(ccHSVValue hsv, ccColor3B color, HSVWidgetDelegate* delegate, std::string p2) {
+        if (!HSVWidgetPopup::init(hsv, color, delegate, p2))
             return false;
 
         if (HSV_SOURCE_COLOR && m_widget) {
