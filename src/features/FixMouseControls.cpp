@@ -22,7 +22,7 @@ class $modify(EditorUI) {
         
         // Disable scrolling during playtest
         if (m_editorLayer->m_playbackMode == PlaybackMode::Playing) {
-            return;
+            return true;
         }
 
         // this is used a lot so store it in a variable
