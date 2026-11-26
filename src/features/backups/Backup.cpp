@@ -3,7 +3,7 @@
 #include <Geode/utils/file.hpp>
 #include <Geode/utils/JsonValidation.hpp>
 #include <utils/GMD.hpp>
-#include <cvolton.level-id-api/include/EditorIDs.hpp>
+#include <cvolton.level-id-api/EditorIDs.hpp>
 #include <matjson/stl_serialize.hpp>
 #include <fmt/chrono.h>
 #include <asp/fs/fs.hpp>
