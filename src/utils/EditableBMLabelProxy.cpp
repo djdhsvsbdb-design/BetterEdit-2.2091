@@ -25,7 +25,13 @@ EditableBMLabelProxy* EditableBMLabelProxy::replace(
     proxy->m_inputParent = inputParent;
     proxy->m_input = TextInput::create(width, placeholder.c_str());
     proxy->m_input->ignoreAnchorPointForPosition(false);
-    proxy->m_input->setCallback([proxy](std::string const& value) {\n        if (proxy->m_onSetValue && !proxy->m_ignoreLabelUpdate) {\n            proxy->m_ignoreLabelUpdate = true;\n            proxy->m_onSetValue(value);\n            proxy->m_ignoreLabelUpdate = false;\n        }\n    });
+    proxy->m_input->setCallback([proxy](std::string const& value) {
+        if (proxy->m_onSetValue && !proxy->m_ignoreLabelUpdate) {
+            proxy->m_ignoreLabelUpdate = true;
+            proxy->m_onSetValue(value);
+            proxy->m_ignoreLabelUpdate = false;
+        }
+    });
     proxy->m_inputParent->addChild(proxy->m_input);
 
     auto parent = existing->getParent();
