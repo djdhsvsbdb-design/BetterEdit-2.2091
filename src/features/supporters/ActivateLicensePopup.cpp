@@ -113,11 +113,11 @@ bool ActivateLicensePopup::init() {
         input->setMaxCharCount(4);
         input->setCallback([this, i](std::string const& text) {
             if (i + 1 < m_inputs.size() && text.size() >= 4) {
-                m_inputs[i]->defocus();
+                m_inputs[i]->unfocus();
                 m_inputs[i + 1]->focus();
             }
             else if (i > 0 && text.size() == 0) {
-                m_inputs[i]->defocus();
+                m_inputs[i]->unfocus();
                 m_inputs[i - 1]->focus();
             }
             this->updateState();

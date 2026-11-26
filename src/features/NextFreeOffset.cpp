@@ -45,6 +45,7 @@ class $modify(SetGroupIDLayer) {
         return true;
     }
 
+#if GEODE_COMP_GD_VERSION < 22091
     $override
     void onNextGroupID1(CCObject*) {
         m_groupIDValue = NextFreeOffsetInput<GroupIDSource>::getNextFreeID();
@@ -54,4 +55,6 @@ class $modify(SetGroupIDLayer) {
         // auto _ = NextFreeOffsetInput<GroupIDAllocator>::addFakeObjects();
         // SetGroupIDLayer::onNextGroupID1(sender);
     }
+#endif
+
 };

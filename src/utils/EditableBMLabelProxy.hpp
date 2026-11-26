@@ -3,11 +3,10 @@
 #include <Geode/DefaultInclude.hpp>
 #include <Geode/utils/cocos.hpp>
 #include <Geode/ui/TextInput.hpp>
-#include <Geode/binding/TextInputDelegate.hpp>
 
 using namespace geode::prelude;
 
-class EditableBMLabelProxy : public CCLabelBMFont, TextInputDelegate {
+class EditableBMLabelProxy : public CCLabelBMFont {
 protected:
     Ref<TextInput> m_input = nullptr;
     CCNode* m_inputParent = nullptr;
@@ -55,7 +54,6 @@ public:
     void setString(const char* str) override;
     void setString(const char* str, bool needUpdateLabel) override;
 
-    void textChanged(CCTextInputNode*) override;
 
     TextInput* getInput() const;
 };

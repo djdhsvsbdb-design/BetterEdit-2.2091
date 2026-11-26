@@ -237,7 +237,6 @@ bool GroupSummaryPopup::init(EditorUI* ui) {
 
     m_search = TextInput::create(m_groupsListContainer->getContentWidth() / .75f, "Search Groups");
     m_search->setCommonFilter(CommonFilter::Uint);
-    m_search->setTextAlign(TextInputAlign::Left);
     m_search->setScale(.75f);
     m_search->setString(lastSearchQuery);
     m_search->setCallback([this](std::string const&) {

@@ -15,14 +15,14 @@ using namespace geode::prelude;
 
 class $modify(EditorUI) {
     $override
-    virtual void scrollWheel(float y, float x) {
+    virtual bool scrollWheel(float y, float x) {
         if (!Mod::get()->getSettingValue<bool>("enable-fixed-mouse-controls")) {
             return EditorUI::scrollWheel(y, x);
         }
         
         // Disable scrolling during playtest
         if (m_editorLayer->m_playbackMode == PlaybackMode::Playing) {
-            return;
+            return true;
         }
 
         // this is used a lot so store it in a variable
@@ -96,6 +96,7 @@ class $modify(EditorUI) {
         rel = rel * (objLayer->getScale()) / prevScale;
 
         m_swipeStart = m_swipeStart + rel;
+        return true;
     }
 };
 

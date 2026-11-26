@@ -4,7 +4,7 @@
 #include <Geode/binding/GameManager.hpp>
 #include <Geode/utils/cocos.hpp>
 #include <utils/Editor.hpp>
-#include <alphalaneous.editortab_api/include/EditorTabAPI.hpp>
+#include <alphalaneous.editortab_api/API.hpp>
 
 using namespace geode::prelude;
 
@@ -201,7 +201,8 @@ public:
         m_editorUI->m_editButtonBar->setVisible(false);
 
         // If we're not showing, we don't need to update the menu layout, just return
-        if (!show || alpha::editor_tabs::getCurrentMode() != Ok(alpha::editor_tabs::EDIT)) {
+        auto editMode = alpha::editor_tabs::getMode(alpha::editor_tabs::Edit);
+        if (!show || !editMode || alpha::editor_tabs::getCurrentMode() != editMode) {
             this->setVisible(false);
             return;
         }
@@ -314,6 +315,10 @@ public:
 };
 
 class $modify(MoreButtonsUI, EditorUI) {
+    struct Fields {
+        ListenerHandle onModeSwitch;
+    };
+
     $override
     bool init(LevelEditorLayer* editor) {
         if (!EditorUI::init(editor))
@@ -345,11 +350,13 @@ class $modify(MoreButtonsUI, EditorUI) {
         // Create the custom edit menu
         (void)CustomEditMenu::get(this, true);
 
-        alpha::editor_tabs::addTabSwitchCallback([this](ZStringView) {
-            if (auto menu = CustomEditMenu::get(this)) {
-                menu->updateMenu();
-            }
-        });
+        if (auto editMode = alpha::editor_tabs::getMode(alpha::editor_tabs::Edit)) {
+            m_fields->onModeSwitch = alpha::editor_tabs::Mode::SwitchModeEvent(editMode).listen([this](bool show) {
+                if (auto menu = CustomEditMenu::get(this)) {
+                    menu->updateMenu(show);
+                }
+            });
+        }
 
         return true;
     }

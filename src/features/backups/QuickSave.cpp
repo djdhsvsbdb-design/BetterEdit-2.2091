@@ -4,49 +4,58 @@
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/binding/LocalLevelManager.hpp>
 #include <Geode/binding/FLAlertLayer.hpp>
-#include <cvolton.level-id-api/include/EditorIDs.hpp>
-#include <hjfod.gmd-api/include/GMD.hpp>
+#include <cvolton.level-id-api/EditorIDs.hpp>
+#include <utils/GMD.hpp>
 #include <utils/HolyUB.hpp>
 #include <utils/Editor.hpp>
+#include <asp/fs/fs.hpp>
 
 using namespace geode::prelude;
 
-static std::filesystem::path getQuickSaveDir() {
+static asp::fs::Path getQuickSaveDir() {
     return Mod::get()->getSaveDir() / "quicksave";
 }
 
 // Autosave is stored separately, as if you press Exit without saving in the 
 // editor then that should discard autosaves too, but not quicksaves
-static std::filesystem::path getAutoSaveDir() {
+static asp::fs::Path getAutoSaveDir() {
     return Mod::get()->getSaveDir() / "autosave";
 }
 
+#if GEODE_COMP_GD_VERSION < 22091
 static bool CREATING_AUTO_SAVE = false;
+#endif
+
 void createAutoSave(LevelEditorLayer* lel) {
+#if GEODE_COMP_GD_VERSION < 22091
     CREATING_AUTO_SAVE = true;
     fakeEditorPauseLayer(lel)->saveLevel();
     CREATING_AUTO_SAVE = false;
+#else
+    // saveLevel is inline in GD 2.2091 and cannot be hooked for crash snapshots.
+    (void)lel;
+#endif
 }
 
 static bool SKIP_NEXT_LLM_SAVE = false;
 class $modify(GManager) {
 	$override
-	void save() {
+	void save(bool async) {
         auto isLLM = static_cast<LocalLevelManager*>(static_cast<GManager*>(this)) == LocalLevelManager::get();
 		if (isLLM && SKIP_NEXT_LLM_SAVE) {
             SKIP_NEXT_LLM_SAVE = false;
             return;
 		}
-        GManager::save();
+        GManager::save(async);
         // If we have succesfully saved local levels, we can delete the temp quick save directory
         if (isLLM) {
-            std::error_code ec;
-            std::filesystem::remove_all(getQuickSaveDir(), ec);
-            std::filesystem::remove_all(getAutoSaveDir(), ec);
+            (void)asp::fs::removeDirAll(getQuickSaveDir());
+            (void)asp::fs::removeDirAll(getAutoSaveDir());
         }
 	}
 };
 class $modify(EditorPauseLayer) {
+#if GEODE_COMP_GD_VERSION < 22091
     $override
     void saveLevel() {
         // If quicksaving is disabled, save normally
@@ -69,6 +78,7 @@ class $modify(EditorPauseLayer) {
             log::error("Unable to save level '{}': {}", m_editorLayer->m_level->m_levelName, res.unwrapErr());
         }
     }
+#endif
 
     $override
     void FLAlert_Clicked(FLAlertLayer* fl, bool btn2) {
@@ -79,10 +89,8 @@ class $modify(EditorPauseLayer) {
         // Discard autosaves on exit without save
         if (fl->getTag() == 1 && btn2) {
             log::warn("Discarding autosaved changes");
-            std::error_code ec;
-            std::filesystem::remove_all(
-                getAutoSaveDir() / fmt::format("{}.gmd", EditorIDs::getID(m_editorLayer->m_level)),
-                ec
+            (void)asp::fs::remove(
+                getAutoSaveDir() / fmt::format("{}.gmd", EditorIDs::getID(m_editorLayer->m_level))
             );
         }
         EditorPauseLayer::FLAlert_Clicked(fl, btn2);
@@ -127,13 +135,15 @@ class $modify(MenuLayer) {
         return true;
     }
 
-    static void restoreCrashData(std::filesystem::path const& path) {
+    static void restoreCrashData(asp::fs::Path const& path) {
         for (auto file : file::readDirectory(path).unwrapOrDefault()) {
             auto data = gmd::importGmdAsLevel(file);
             if (!data) continue;
             auto imported = *data;
 
-            auto num = numFromString<int>(file.stem().string());
+            auto stem = file.stem();
+            if (!stem) continue;
+            auto num = numFromString<int>(*stem);
             if (!num) continue;
 
             // Restore existing level

@@ -15,6 +15,9 @@ public:
     static inline std::vector<CCMenuItemToggler*> buttons = {};
 };
 
+// Geometry Dash 2.2091 no longer uses the legacy SelectFontLayer on Windows/iOS.
+// Its init(LevelEditorLayer*) implementation is absent on those platforms.
+#if !defined(GEODE_IS_WINDOWS) && !defined(GEODE_IS_IOS)
 class $modify(BetterSelectFontLayer, SelectFontLayer) {
     void onSelect(CCObject* sender) {
         int s = static_cast<CCNode*>(sender)->getTag();
@@ -137,3 +140,4 @@ class $modify(BetterSelectFontLayer, SelectFontLayer) {
         return true;
     }
 };
+#endif

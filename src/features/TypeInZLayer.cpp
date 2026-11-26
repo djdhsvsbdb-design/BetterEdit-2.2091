@@ -57,7 +57,7 @@ class $modify(TypeInUI, EditorUI) {
             }
         );
         m_currentLayerLabel = proxy;
-        be::evilForceTouchPrio(this, proxy->getInput()->getInputNode());
+
 
         // Delete the existing layer lock button that's just an overlay on the text
         if (auto lock = this->getChildByIDRecursive("lock-layer-button")) {

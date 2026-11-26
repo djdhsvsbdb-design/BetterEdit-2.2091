@@ -322,7 +322,7 @@ void MySupportPopup::onLoadData(Result<pro::server::MySupport> result) {
         nameInput->setScale(.6f);
         nameInput->setID(fmt::format("input-{}", device.deviceID));
         nameInput->setString(device.deviceName);
-        nameInput->setTextAlign(TextInputAlign::Left);
+        nameInput->setAlignment(Label::Alignment::Left);
         node->addChildAtPosition(nameInput, Anchor::Left, ccp(offset, 0), ccp(0, .5f));
 
         offset += nameInput->getScaledContentWidth() + 5;

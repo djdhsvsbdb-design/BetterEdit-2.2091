@@ -283,16 +283,12 @@ class $modify(SnappableScaleControl, GJScaleControl) {
     }
 
     $override
-    void loadValues(GameObject* obj, CCArray* objs, gd::unordered_map<int, GameObjectEditorState>& states) {
+    void loadValues(GameObject* obj, CCArray* objs, std::unordered_map<int, GameObjectEditorState>& states) {
         GJScaleControl::loadValues(obj, objs, states);
 
         this->updateInput(this->getInputX());
         this->updateInput(this->getInputY());
         this->updateInput(this->getInputXY());
-
-        be::evilForceTouchPrio(static_cast<EditorUI*>(m_delegate), this->getInputX()->getInputNode());
-        be::evilForceTouchPrio(static_cast<EditorUI*>(m_delegate), this->getInputY()->getInputNode());
-        be::evilForceTouchPrio(static_cast<EditorUI*>(m_delegate), this->getInputXY()->getInputNode());
     }
     $override
     void updateLabelX(float scale) {
@@ -351,9 +347,9 @@ class $modify(SnappableScaleControl, GJScaleControl) {
         GJScaleControl::ccTouchMoved(touch, event);
         m_delegate = delegate;
 
-        inputX->defocus();
-        inputY->defocus();
-        inputXY->defocus();
+        inputX->unfocus();
+        inputY->unfocus();
+        inputXY->unfocus();
 
         auto scaleX = this->scaleFromValue(m_sliderX->getThumb()->getValue());
         auto scaleY = this->scaleFromValue(m_sliderY->getThumb()->getValue());
@@ -452,7 +448,7 @@ class $modify(InputRotationControl, GJRotationControl) {
         input->setCallback([this](auto const& str) {
             if (auto angle = numFromString<float>(str)) {
                 m_delegate->angleChangeBegin();
-                m_delegate->angleChanged(*angle);
+                m_delegate->angleChanged(*angle, getPosLock()->isToggled());
                 m_delegate->angleChangeEnded();
                 this->setThumbValue(*angle);
             }
@@ -529,7 +525,7 @@ class $modify(InputRotationControl, GJRotationControl) {
         m_delegate = delegate;
 
         auto input = this->getInput();
-        input->defocus();
+        input->unfocus();
 
         auto angle = this->getThumbValue();
         if (auto lock = this->getSnapLock(); lock && lock->isToggled()) {
@@ -537,7 +533,7 @@ class $modify(InputRotationControl, GJRotationControl) {
             angle = roundf(this->getThumbValue() / tickSize) * tickSize;
             m_controlSprite->setPosition(pointOnCircle(-angle + 90, 60));
         }
-        m_delegate->angleChanged(angle);
+        m_delegate->angleChanged(angle, getPosLock()->isToggled());
         input->setString(numToString(angle, 3));
     }
 
@@ -546,8 +542,6 @@ class $modify(InputRotationControl, GJRotationControl) {
         auto angle = objs.front()->getRotation();
         this->setThumbValue(angle);
         this->getInput()->setString(numToString(angle, 3));
-
-        be::evilForceTouchPrio(static_cast<EditorUI*>(m_delegate), this->getInput()->getInputNode());
     }
 
     void onSnapLock(CCObject* sender){
@@ -596,8 +590,8 @@ class $modify(EditorUI) {
     }
     // Make angleChanged be absolute rotation instead of relative
     $override
-    void angleChanged(float angle) {
-        if (0) { return EditorUI::angleChanged(angle); }
+    void angleChanged(float angle, bool lock) {
+        if (0) { return EditorUI::angleChanged(angle, lock); }
         CCArray* objs = nullptr;
         bool lockPos = static_cast<InputRotationControl*>(m_rotationControl)->getPosLock()->isToggled();
         if (m_selectedObjects && m_selectedObjects->count()) {
@@ -610,7 +604,7 @@ class $modify(EditorUI) {
         if (objs) {
             auto orig = static_cast<GameObject*>(objs->firstObject())->getRotation();
             m_fields->lockRotationPosition = lockPos;
-            this->rotateObjects(objs, -orig + angle, m_pivotPoint);
+            this->rotateObjects(objs, -orig + angle, m_pivotPoint, lock);
             m_fields->lockRotationPosition = false;
         }
     }

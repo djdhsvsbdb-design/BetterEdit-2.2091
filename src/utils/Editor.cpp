@@ -7,45 +7,21 @@
 #include <Geode/binding/EditButtonBar.hpp>
 #include <Geode/binding/GameObject.hpp>
 #include <Geode/binding/EffectGameObject.hpp>
-#include <Geode/binding/CCTextInputNode.hpp>
 #include <utils/Warn.hpp>
 
-// i hate touch prioi hate touch prioi hate touch prioi hate touch prioi hate 
-// touch prioi hate touch prioi hate touch prioi hate touch prioi hate touch 
-// aka fix that will make you audibly say "kill yourself"
-class $modify(SuperExtraEvenMoreForcePrioUI, EditorUI) {
-    struct Fields {
-        std::unordered_set<CCTextInputNode*> forceTouchPrio;
-    };
-
-    $override
-    bool ccTouchBegan(CCTouch* touch, CCEvent* event) {
-        for (auto input : m_fields->forceTouchPrio) {
-            if (nodeIsVisible(input) && CCRect(
-                input->getPosition() - input->getScaledContentSize() / 2,
-                input->getScaledContentSize()
-            ).containsPoint(input->getParent()->convertTouchToNodeSpace(touch))) {
-                return input->ccTouchBegan(touch, event);
-            }
-        }
-        return EditorUI::ccTouchBegan(touch, event);
-    }
-};
-
-//// Free-standing helpers
 std::vector<GameObject*> be::getSelectedObjects(EditorUI* ui) {
-    if (ui->m_selectedObject) {
-        return std::vector<GameObject*>({ ui->m_selectedObject });
-    }
-    else {
-        // todo: remove this stupid bullshit once we bring back a good replacement for ccArrayToVector
-        auto ext = CCArrayExt<GameObject*>(ui->m_selectedObjects);
-        return std::vector<GameObject*>(ext.begin(), ext.end());
-    }
-}
+    std::vector<GameObject*> objects;
+    if (!ui) return objects;
 
-void be::evilForceTouchPrio(EditorUI* ui, CCTextInputNode* input) {
-    static_cast<SuperExtraEvenMoreForcePrioUI*>(ui)->m_fields->forceTouchPrio.insert(input);
+    if (ui->m_selectedObjects && ui->m_selectedObjects->count()) {
+        for (auto object : CCArrayExt<GameObject*>(ui->m_selectedObjects)) {
+            objects.push_back(object);
+        }
+    }
+    else if (ui->m_selectedObject) {
+        objects.push_back(ui->m_selectedObject);
+    }
+    return objects;
 }
 
 //// Editor exit events

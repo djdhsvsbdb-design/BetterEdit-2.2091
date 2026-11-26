@@ -25,7 +25,13 @@ EditableBMLabelProxy* EditableBMLabelProxy::replace(
     proxy->m_inputParent = inputParent;
     proxy->m_input = TextInput::create(width, placeholder.c_str());
     proxy->m_input->ignoreAnchorPointForPosition(false);
-    proxy->m_input->setDelegate(proxy);
+    proxy->m_input->setCallback([proxy](std::string const& value) {
+        if (proxy->m_onSetValue && !proxy->m_ignoreLabelUpdate) {
+            proxy->m_ignoreLabelUpdate = true;
+            proxy->m_onSetValue(value);
+            proxy->m_ignoreLabelUpdate = false;
+        }
+    });
     proxy->m_inputParent->addChild(proxy->m_input);
 
     auto parent = existing->getParent();
@@ -76,7 +82,7 @@ void EditableBMLabelProxy::setScale(float scale) {
 
 void EditableBMLabelProxy::setColor(ccColor3B const& color) {
     CCLabelBMFont::setColor(color);
-    if (m_input) m_input->getInputNode()->setLabelNormalColor(color);
+    if (m_input) m_input->setTextColor({ color.r, color.g, color.b, 255 });
 }
 
 void EditableBMLabelProxy::updateLabel() {
@@ -97,14 +103,6 @@ void EditableBMLabelProxy::setString(const char* str, bool needUpdateLabel) {
         if (m_onUpdate) {
             m_onUpdate(str);
         }
-        m_ignoreLabelUpdate = false;
-    }
-}
-
-void EditableBMLabelProxy::textChanged(CCTextInputNode*) {
-    if (m_onSetValue && !m_ignoreLabelUpdate) {
-        m_ignoreLabelUpdate = true;
-        m_onSetValue(m_input->getString());
         m_ignoreLabelUpdate = false;
     }
 }

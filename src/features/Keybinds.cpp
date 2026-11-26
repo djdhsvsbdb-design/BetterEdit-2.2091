@@ -103,6 +103,8 @@ struct $modify(EditorUI) {
             }
         });
 
+        // These EditorPauseLayer callbacks are absent from GD 2.2091 bindings.
+#if GEODE_COMP_GD_VERSION < 22091
         this->defineKeybind("keybind-build-helper", [this]() {
             fakeEditorPauseLayer(m_editorLayer)->onBuildHelper(nullptr);
         });
@@ -124,6 +126,7 @@ struct $modify(EditorUI) {
         this->defineKeybind("keybind-select-all-right", [this]() {
             fakeEditorPauseLayer(m_editorLayer)->onSelectAllRight(nullptr);
         });
+#endif
 
         this->defineKeybind("keybind-move-obj-half-left", [this] {
             this->moveObjectCall(EditCommand::HalfLeft);

@@ -207,7 +207,7 @@ public:
 
     void replace(CCTextInputNode*& inputMember, CCNode* menu) {
         if (!menu) return;
-        inputMember = m_input->getInputNode();
+        inputMember = nullptr;
         
         this->setPosition(menu->getPosition());
         menu->getParent()->addChild(this);
@@ -247,8 +247,8 @@ public:
         if (this->isMixed()) {
             auto minmax = this->getMinMax();
             m_input->setEnabled(false);
-            m_input->getInputNode()->m_textLabel->setOpacity(255);
-            m_input->defocus();
+            m_input->getContentLabel()->setOpacity(255);
+            m_input->unfocus();
             m_unmixBtn->setVisible(true);
             m_input->setString(fmt::format("{}..{}", minmax.min, minmax.max));
         }
