@@ -11,7 +11,7 @@
 #include <utils/Editor.hpp>
 #include <utils/HolyUB.hpp>
 #include <features/supporters/Pro.hpp>
-#include <alphalaneous.editortab_api/include/API.hpp>
+#include <alphalaneous.editortab_api/API.hpp>
 
 using namespace geode::prelude;
 
