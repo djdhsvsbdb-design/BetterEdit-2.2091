@@ -8,10 +8,11 @@
 #include <hjfod.gmd-api/include/GMD.hpp>
 #include <utils/HolyUB.hpp>
 #include <utils/Editor.hpp>
+#include <asp/fs/fs.hpp>
 
 using namespace geode::prelude;
 
-static std::filesystem::path getQuickSaveDir() {
+static asp::fs::Path getQuickSaveDir() {
     return Mod::get()->getSaveDir() / "quicksave";
 }
 
