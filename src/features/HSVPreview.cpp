@@ -84,7 +84,7 @@ class $modify(CustomizeObjectLayer) {
 };
 class $modify(HSVWidgetPopup) {
     $override
-    bool init(ccHSVValue hsv, HSVWidgetDelegate* delegate, gd::string p2) {
+    bool init(ccHSVValue hsv, HSVWidgetDelegate* delegate, std::string p2) {
         if (!HSVWidgetPopup::init(hsv, delegate, p2))
             return false;
 

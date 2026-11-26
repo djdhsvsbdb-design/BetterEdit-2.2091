@@ -15,7 +15,7 @@ using namespace geode::prelude;
 class AboutBEPopup;
 
 namespace pro {
-    inline std::filesystem::path getKeyPath() {
+    inline auto getKeyPath() {
         return dirs::getSaveDir() / ".betteredit-key-please-do-not-delete";
     }
 
