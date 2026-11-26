@@ -131,7 +131,9 @@ class $modify(MenuLayer) {
             if (!data) continue;
             auto imported = *data;
 
-            auto num = numFromString<int>(file.stem().string());
+            auto stem = file.stem();
+            if (!stem) continue;
+            auto num = numFromString<int>(*stem);
             if (!num) continue;
 
             // Restore existing level
