@@ -76,7 +76,7 @@ void EditableBMLabelProxy::setScale(float scale) {
 
 void EditableBMLabelProxy::setColor(ccColor3B const& color) {
     CCLabelBMFont::setColor(color);
-    if (m_input) m_input->getInputNode()->setLabelNormalColor(color);
+    if (m_input) m_input->setTextColor({ color.r, color.g, color.b, 255 });
 }
 
 void EditableBMLabelProxy::updateLabel() {
