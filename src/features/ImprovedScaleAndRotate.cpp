@@ -289,10 +289,6 @@ class $modify(SnappableScaleControl, GJScaleControl) {
         this->updateInput(this->getInputX());
         this->updateInput(this->getInputY());
         this->updateInput(this->getInputXY());
-
-        be::evilForceTouchPrio(static_cast<EditorUI*>(m_delegate), this->getInputX()->getInputNode());
-        be::evilForceTouchPrio(static_cast<EditorUI*>(m_delegate), this->getInputY()->getInputNode());
-        be::evilForceTouchPrio(static_cast<EditorUI*>(m_delegate), this->getInputXY()->getInputNode());
     }
     $override
     void updateLabelX(float scale) {
@@ -351,9 +347,9 @@ class $modify(SnappableScaleControl, GJScaleControl) {
         GJScaleControl::ccTouchMoved(touch, event);
         m_delegate = delegate;
 
-        inputX->defocus();
-        inputY->defocus();
-        inputXY->defocus();
+        inputX->unfocus();
+        inputY->unfocus();
+        inputXY->unfocus();
 
         auto scaleX = this->scaleFromValue(m_sliderX->getThumb()->getValue());
         auto scaleY = this->scaleFromValue(m_sliderY->getThumb()->getValue());
@@ -529,7 +525,7 @@ class $modify(InputRotationControl, GJRotationControl) {
         m_delegate = delegate;
 
         auto input = this->getInput();
-        input->defocus();
+        input->unfocus();
 
         auto angle = this->getThumbValue();
         if (auto lock = this->getSnapLock(); lock && lock->isToggled()) {
