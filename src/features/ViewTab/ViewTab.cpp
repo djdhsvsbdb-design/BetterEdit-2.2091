@@ -39,6 +39,7 @@ class $modify(GameObjectExtra, GameObject) {
 
 struct $modify(ViewTabUI, EditorUI) {
     static void onModify(auto& self) {
+        (void)self.setHookPriority("EditorUI::init", Priority::Early);
         (void)self.setHookPriority("EditorUI::selectObject", Priority::VeryLate);
         (void)self.setHookPriority("EditorUI::selectObjects", Priority::VeryLate);
     }
@@ -220,18 +221,12 @@ struct $modify(ViewTabUI, EditorUI) {
     $override
     bool init(LevelEditorLayer* lel) {
         const bool enableViewTab = Mod::get()->template getSettingValue<bool>("view-menu");
-        if (enableViewTab) {
-            this->addEventListener(
-                alpha::editor_tabs::AllTabsInitializedEvent(),
-                [this] { this->setupViewTab(); }
-            );
-        }
-
         if (!EditorUI::init(lel)) {
             return false;
         }
 
         if (enableViewTab) {
+            this->setupViewTab();
             this->addEventListener(
                 KeybindSettingPressedEventV3(Mod::get(), "keybind-view-mode"),
                 [this](Keybind const&, bool down, bool, double) {
