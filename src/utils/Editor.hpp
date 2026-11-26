@@ -15,8 +15,6 @@ namespace be {
     /**
      * Forces touch priority of a text input contained within `GJBaseGameLayer`
      */
-    void evilForceTouchPrio(EditorUI* ui, CCTextInputNode* input);
-
     /**
      * Create a view-only editor, i.e. one where no objects can be placed nor 
      * edited
