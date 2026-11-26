@@ -6,10 +6,11 @@
 #include <cvolton.level-id-api/include/EditorIDs.hpp>
 #include <matjson/stl_serialize.hpp>
 #include <fmt/chrono.h>
+#include <asp/fs/fs.hpp>
 
 // todo: list backups associated with deleted / lost levels
 
-std::filesystem::path getBackupsDir(GJGameLevel* level) {
+asp::fs::Path getBackupsDir(GJGameLevel* level) {
     return dirs::getSaveDir() / "betteredit-level-backups" / std::to_string(EditorIDs::getID(level));
 }
 
@@ -102,7 +103,7 @@ Result<std::shared_ptr<Backup>> Backup::load(std::filesystem::path const& dir, G
 std::vector<std::shared_ptr<Backup>> Backup::load(GJGameLevel* level) {
     std::vector<std::shared_ptr<Backup>> res;
     for (auto folder : file::readDirectory(getBackupsDir(level)).unwrapOrDefault()) {
-        if (!std::filesystem::is_directory(folder)) {
+        if (!folder.isDir()) {
             continue;
         }
         auto b = Backup::load(folder, level);
@@ -127,7 +128,7 @@ Result<> Backup::create(GJGameLevel* level, bool automated) {
     auto time = Clock::now();
 
     auto dir = getBackupsDir(level) / fmt::format("{:%Y-%m-%d_%H-%M}", time);
-    if (std::filesystem::exists(dir)) {
+    if (dir.exists()) {
         return Err("Level was already backed up less than a minute ago");
     }
 
