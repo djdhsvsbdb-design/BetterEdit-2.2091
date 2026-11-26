@@ -96,6 +96,7 @@ class $modify(EditorUI) {
         rel = rel * (objLayer->getScale()) / prevScale;
 
         m_swipeStart = m_swipeStart + rel;
+        return true;
     }
 };
 
