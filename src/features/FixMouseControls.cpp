@@ -15,7 +15,7 @@ using namespace geode::prelude;
 
 class $modify(EditorUI) {
     $override
-    virtual void scrollWheel(float y, float x) {
+    virtual bool scrollWheel(float y, float x) {
         if (!Mod::get()->getSettingValue<bool>("enable-fixed-mouse-controls")) {
             return EditorUI::scrollWheel(y, x);
         }
