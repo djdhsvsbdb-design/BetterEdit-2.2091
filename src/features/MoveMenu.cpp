@@ -315,6 +315,10 @@ public:
 };
 
 class $modify(MoreButtonsUI, EditorUI) {
+    struct Fields {
+        ListenerHandle onModeSwitch;
+    };
+
     $override
     bool init(LevelEditorLayer* editor) {
         if (!EditorUI::init(editor))
