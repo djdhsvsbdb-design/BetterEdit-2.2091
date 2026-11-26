@@ -1,6 +1,7 @@
 name: Build Geode Mod
 
 on:
+  pull_request:
   workflow_dispatch:
   push:
     branches:
