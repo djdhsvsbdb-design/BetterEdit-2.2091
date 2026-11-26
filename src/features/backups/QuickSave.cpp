@@ -22,11 +22,19 @@ static asp::fs::Path getAutoSaveDir() {
     return Mod::get()->getSaveDir() / "autosave";
 }
 
+#if GEODE_COMP_GD_VERSION < 22091
 static bool CREATING_AUTO_SAVE = false;
+#endif
+
 void createAutoSave(LevelEditorLayer* lel) {
+#if GEODE_COMP_GD_VERSION < 22091
     CREATING_AUTO_SAVE = true;
     fakeEditorPauseLayer(lel)->saveLevel();
     CREATING_AUTO_SAVE = false;
+#else
+    // saveLevel is inline in GD 2.2091 and cannot be hooked for crash snapshots.
+    (void)lel;
+#endif
 }
 
 static bool SKIP_NEXT_LLM_SAVE = false;
@@ -47,6 +55,7 @@ class $modify(GManager) {
 	}
 };
 class $modify(EditorPauseLayer) {
+#if GEODE_COMP_GD_VERSION < 22091
     $override
     void saveLevel() {
         // If quicksaving is disabled, save normally
@@ -69,6 +78,7 @@ class $modify(EditorPauseLayer) {
             log::error("Unable to save level '{}': {}", m_editorLayer->m_level->m_levelName, res.unwrapErr());
         }
     }
+#endif
 
     $override
     void FLAlert_Clicked(FLAlertLayer* fl, bool btn2) {

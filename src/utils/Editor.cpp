@@ -9,6 +9,21 @@
 #include <Geode/binding/EffectGameObject.hpp>
 #include <utils/Warn.hpp>
 
+std::vector<GameObject*> be::getSelectedObjects(EditorUI* ui) {
+    std::vector<GameObject*> objects;
+    if (!ui) return objects;
+
+    if (ui->m_selectedObjects && ui->m_selectedObjects->count()) {
+        for (auto object : CCArrayExt<GameObject*>(ui->m_selectedObjects)) {
+            objects.push_back(object);
+        }
+    }
+    else if (ui->m_selectedObject) {
+        objects.push_back(ui->m_selectedObject);
+    }
+    return objects;
+}
+
 //// Editor exit events
 static Ref<CCLayer> SCENE_TO_RETURN_TO = nullptr;
 class $modify(GameManager) {
