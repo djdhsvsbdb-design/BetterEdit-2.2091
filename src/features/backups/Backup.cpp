@@ -67,10 +67,9 @@ Result<> Backup::restoreThis() {
     return Ok();
 }
 Result<> Backup::deleteThis() {
-    std::error_code ec;
-    std::filesystem::remove_all(m_directory, ec);
-    if (ec) {
-        return Err("Unable to delete backup directory: {} (code {})", ec.message(), ec.value());
+    auto res = asp::fs::removeDirAll(m_directory);
+    if (!res) {
+        return Err("Unable to delete backup directory: {}", res.unwrapErr());
     }
     return Ok();
 }
@@ -86,7 +85,7 @@ Result<> Backup::preserveAutomated() {
     return Ok();
 }
 
-Result<std::shared_ptr<Backup>> Backup::load(std::filesystem::path const& dir, GJGameLevel* forLevel) {
+Result<std::shared_ptr<Backup>> Backup::load(asp::fs::Path const& dir, GJGameLevel* forLevel) {
     GEODE_UNWRAP_INTO(auto level, gmd::importGmdAsLevel(dir / "level.gmd").mapErr([](auto error) {
         return fmt::format("Unable to read level file: {}", error);
     }));
@@ -153,7 +152,7 @@ Result<> Backup::create(GJGameLevel* level, bool automated) {
 Result<> Backup::cleanAutomated(GJGameLevel* level) {
     std::vector<std::shared_ptr<Backup>> automated;
     for (auto folder : file::readDirectory(getBackupsDir(level)).unwrapOrDefault()) {
-        if (!std::filesystem::is_directory(folder)) {
+        if (!folder.isDir()) {
             continue;
         }
         auto b = Backup::load(folder, level);
