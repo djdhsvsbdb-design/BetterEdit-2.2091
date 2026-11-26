@@ -54,6 +54,7 @@ class $modify(SetGroupIDLayer) {
         // gammal allokerande version
         // auto _ = NextFreeOffsetInput<GroupIDAllocator>::addFakeObjects();
         // SetGroupIDLayer::onNextGroupID1(sender);
-    }#endif
+    }
+#endif
 
 };
