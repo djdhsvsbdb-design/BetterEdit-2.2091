@@ -48,7 +48,7 @@ struct $modify(ViewTabUI, EditorUI) {
         auto top = CCSprite::createWithSpriteFrameName(frame);
         return ButtonSprite::create(
             top, 50, 0, 50, .8f, true,
-            (selected ? "GJ_button_02.png" : "GJ_button_01.png"), true
+            (selected ? "GJ_button_02.png" : "GJ_button_01.png"), true, 0.f
         );
     }
 
