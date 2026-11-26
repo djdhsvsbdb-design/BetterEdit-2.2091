@@ -10,7 +10,7 @@ using namespace geode::prelude;
 
 class $modify(CopyParticleStringPopup, CreateParticlePopup) {
     $override
-    bool init(ParticleGameObject* obj, CCArray* objs, gd::string str) {
+    bool init(ParticleGameObject* obj, CCArray* objs, std::string str) {
         if (!CreateParticlePopup::init(obj, objs, str))
             return false;
         
