@@ -107,14 +107,6 @@ void EditableBMLabelProxy::setString(const char* str, bool needUpdateLabel) {
     }
 }
 
-void EditableBMLabelProxy::textChanged(CCTextInputNode*) {
-    if (m_onSetValue && !m_ignoreLabelUpdate) {
-        m_ignoreLabelUpdate = true;
-        m_onSetValue(m_input->getString());
-        m_ignoreLabelUpdate = false;
-    }
-}
-
 TextInput* EditableBMLabelProxy::getInput() const {
     return m_input;
 }
