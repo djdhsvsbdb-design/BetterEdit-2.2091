@@ -542,8 +542,6 @@ class $modify(InputRotationControl, GJRotationControl) {
         auto angle = objs.front()->getRotation();
         this->setThumbValue(angle);
         this->getInput()->setString(numToString(angle, 3));
-
-        be::evilForceTouchPrio(static_cast<EditorUI*>(m_delegate), this->getInput()->getInputNode());
     }
 
     void onSnapLock(CCObject* sender){
