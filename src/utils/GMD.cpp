@@ -1,7 +1,7 @@
 #include "GMD.hpp"
 
 #include <Geode/utils/file.hpp>
-#include <Geode/binding/DS_Dictionary.hpp>
+#include <Geode/mapping/DS_Dictionary.hpp>
 #include <algorithm>
 #include <memory>
 #include <string>
