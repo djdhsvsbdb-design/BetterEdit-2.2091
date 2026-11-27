@@ -278,6 +278,7 @@ public:
         this_group_has_already_been_handled_fully_before:;
         }
         editBar->getItems()->removeAllObjects();
+        editBar->m_buttonArray->removeAllObjects();
 
         // Group up move buttons
         for (auto [modID, group] : std::move(groups)) {
