@@ -3,7 +3,6 @@
 #ifdef GEODE_IS_DESKTOP
 
 #include <Geode/modify/EditorUI.hpp>
-#include <Geode/binding/EditButtonBar.hpp>
 #include <Geode/binding/GameManager.hpp>
 #include <Geode/ui/Notification.hpp>
 #include <utils/Editor.hpp>
