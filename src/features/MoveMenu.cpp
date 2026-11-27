@@ -197,11 +197,17 @@ public:
     }
 
     void updateMenu(bool show = true) {
-        // Hide the original
-        m_editorUI->m_editButtonBar->setVisible(false);
+        // The Edit mode is owned by EditorTab API, not EditorUI::m_editButtonBar.
+        auto editMode = alpha::editor_tabs::getMode(alpha::editor_tabs::Edit);
+        auto editTab = editMode ? editMode->getTab("edit") : nullptr;
+        auto editBar = editTab ? editTab->getNode() : nullptr;
+        if (!editBar) {
+            this->setVisible(false);
+            return;
+        }
+        editBar->setVisible(false);
 
         // If we're not showing, we don't need to update the menu layout, just return
-        auto editMode = alpha::editor_tabs::getMode(alpha::editor_tabs::Edit);
         if (!show || !editMode || alpha::editor_tabs::getCurrentMode() != editMode) {
             this->setVisible(false);
             return;
@@ -221,7 +227,7 @@ public:
         };
         
         // Move all buttons from the normal edit button bar to this one
-        for (auto btn : CCArrayExt<CCMenuItemSpriteExtra*>(m_editorUI->m_editButtonBar->m_buttonArray)) {
+        for (auto btn : CCArrayExt<CCMenuItemSpriteExtra*>(editBar->getAllItems())) {
             auto ref = Ref(btn);
             btn->removeFromParent();
 
@@ -271,7 +277,7 @@ public:
 
         this_group_has_already_been_handled_fully_before:;
         }
-        m_editorUI->m_editButtonBar->m_buttonArray->removeAllObjects();
+        editBar->getAllItems()->removeAllObjects();
 
         // Group up move buttons
         for (auto [modID, group] : std::move(groups)) {
@@ -310,65 +316,61 @@ public:
         m_bottomRow->updateLayout();
 
         this->setVisible(true);
-        this->setScale(m_editorUI->m_editButtonBar->getScale());
+        this->setScale(editBar->getScale());
     }
 };
 
 class $modify(MoreButtonsUI, EditorUI) {
     struct Fields {
+        ListenerHandle onTabsInitialized;
         ListenerHandle onModeSwitch;
     };
 
-    $override
-    bool init(LevelEditorLayer* editor) {
-        if (!EditorUI::init(editor))
-            return false;
-        
-        // The reason this is all done in init() rather than createMoveMenu() 
-        // is that we want NodeIDs to have added the IDs first
-
-        this->addMoveButton("move-up-quarter-button"_spr,    "edit_upBtn5_001.png",    EditCommandExt::QuarterUp);
-        this->addMoveButton("move-down-quarter-button"_spr,  "edit_downBtn5_001.png",  EditCommandExt::QuarterDown);
-        this->addMoveButton("move-left-quarter-button"_spr,  "edit_leftBtn5_001.png",  EditCommandExt::QuarterLeft);
-        this->addMoveButton("move-right-quarter-button"_spr, "edit_rightBtn5_001.png", EditCommandExt::QuarterRight);
-
-        this->addMoveButton("move-up-eighth-button"_spr,    "edit_upBtn5_001.png",    EditCommandExt::EighthUp);
-        this->addMoveButton("move-down-eighth-button"_spr,  "edit_downBtn5_001.png",  EditCommandExt::EighthDown);
-        this->addMoveButton("move-left-eighth-button"_spr,  "edit_leftBtn5_001.png",  EditCommandExt::EighthLeft);
-        this->addMoveButton("move-right-eighth-button"_spr, "edit_rightBtn5_001.png", EditCommandExt::EighthRight);
-
-        this->addMoveButton("move-up-unit-button"_spr,    "edit_upBtn_001.png",    EditCommandExt::UnitUp);
-        this->addMoveButton("move-down-unit-button"_spr,  "edit_downBtn_001.png",  EditCommandExt::UnitDown);
-        this->addMoveButton("move-left-unit-button"_spr,  "edit_leftBtn_001.png",  EditCommandExt::UnitLeft);
-        this->addMoveButton("move-right-unit-button"_spr, "edit_rightBtn_001.png", EditCommandExt::UnitRight);
-
-        m_editButtonBar->reloadItems(
-            GameManager::get()->getIntGameVariable("0049"),
-            GameManager::get()->getIntGameVariable("0050")
-        );
-
-        // Create the custom edit menu
-        (void)CustomEditMenu::get(this, true);
-
-        if (auto editMode = alpha::editor_tabs::getMode(alpha::editor_tabs::Edit)) {
-            m_fields->onModeSwitch = alpha::editor_tabs::Mode::SwitchModeEvent(editMode).listen([this](bool show) {
-                if (auto menu = CustomEditMenu::get(this)) {
-                    menu->updateMenu(show);
-                }
-            });
+    void setupBetterEditMoveMenu() {
+        auto editMode = alpha::editor_tabs::getMode(alpha::editor_tabs::Edit);
+        auto editTab = editMode ? editMode->getTab("edit") : nullptr;
+        auto editBar = editTab ? editTab->getNode() : nullptr;
+        if (!editBar) {
+            log::error("BetterEdit: EditorTab API Edit tab is unavailable after initialization");
+            return;
         }
 
+        this->addMoveButton(editBar, "move-up-quarter-button"_spr,    "edit_upBtn5_001.png",    EditCommandExt::QuarterUp);
+        this->addMoveButton(editBar, "move-down-quarter-button"_spr,  "edit_downBtn5_001.png",  EditCommandExt::QuarterDown);
+        this->addMoveButton(editBar, "move-left-quarter-button"_spr,  "edit_leftBtn5_001.png",  EditCommandExt::QuarterLeft);
+        this->addMoveButton(editBar, "move-right-quarter-button"_spr, "edit_rightBtn5_001.png", EditCommandExt::QuarterRight);
+        this->addMoveButton(editBar, "move-up-eighth-button"_spr,    "edit_upBtn5_001.png",    EditCommandExt::EighthUp);
+        this->addMoveButton(editBar, "move-down-eighth-button"_spr,  "edit_downBtn5_001.png",  EditCommandExt::EighthDown);
+        this->addMoveButton(editBar, "move-left-eighth-button"_spr,  "edit_leftBtn5_001.png",  EditCommandExt::EighthLeft);
+        this->addMoveButton(editBar, "move-right-eighth-button"_spr, "edit_rightBtn5_001.png", EditCommandExt::EighthRight);
+        this->addMoveButton(editBar, "move-up-unit-button"_spr,    "edit_upBtn_001.png",    EditCommandExt::UnitUp);
+        this->addMoveButton(editBar, "move-down-unit-button"_spr,  "edit_downBtn_001.png",  EditCommandExt::UnitDown);
+        this->addMoveButton(editBar, "move-left-unit-button"_spr,  "edit_leftBtn_001.png",  EditCommandExt::UnitLeft);
+        this->addMoveButton(editBar, "move-right-unit-button"_spr, "edit_rightBtn_001.png", EditCommandExt::UnitRight);
+        editBar->reloadAllItems();
+
+        (void)CustomEditMenu::get(this, true);
+        m_fields->onModeSwitch = alpha::editor_tabs::Mode::SwitchModeEvent(editMode).listen([this](bool show) {
+            if (auto menu = CustomEditMenu::get(this)) menu->updateMenu(show);
+        });
+    }
+
+    $override
+    bool init(LevelEditorLayer* editor) {
+        m_fields->onTabsInitialized = alpha::editor_tabs::AllTabsInitializedEvent().listen([this]() {
+            this->setupBetterEditMoveMenu();
+        });
+        if (!EditorUI::init(editor)) return false;
         return true;
     }
 
-    void addMoveButton(const char* id, const char* spr, EditCommand command) {
+    void addMoveButton(alpha::editor_tabs::EditorTab* editBar, const char* id, const char* spr, EditCommand command) {
         auto btn = this->getSpriteButton(spr, menu_selector(MoreButtonsUI::onMyMoveObject), nullptr, .9f);
         btn->setID(id);
         btn->setTag(static_cast<int>(command));
-        m_editButtonBar->m_buttonArray->addObject(btn);
+        editBar->addItem(btn);
     }
 
-    // EditorUI::moveObjectCall was resolving to the wrong callback for some reason
     void onMyMoveObject(CCObject* sender) {
         this->moveObjectCall(static_cast<EditCommand>(sender->getTag()));
     }
@@ -376,20 +378,6 @@ class $modify(MoreButtonsUI, EditorUI) {
     $override
     void resetUI() {
         EditorUI::resetUI();
-        if (auto menu = CustomEditMenu::get(this)) {
-            menu->updateMenu();
-        }
+        if (auto menu = CustomEditMenu::get(this)) menu->updateMenu();
     }
-};
-
-class $modify(EditButtonBar) {
-    $override
-    void loadFromItems(CCArray* items, int r, int c, bool unkBool) {
-        EditButtonBar::loadFromItems(items, r, c, unkBool);
-        if (this->getID() == "edit-tab-bar") {
-            if (auto menu = CustomEditMenu::get(EditorUI::get())) {
-                menu->updateMenu();
-            }
-        }
-    }
-};
+}
