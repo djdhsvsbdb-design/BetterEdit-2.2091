@@ -3,7 +3,6 @@
 #include <Geode/modify/DrawGridLayer.hpp>
 #include <Geode/modify/LevelEditorLayer.hpp>
 #include <Geode/binding/ButtonSprite.hpp>
-#include <Geode/binding/EditButtonBar.hpp>
 #include <Geode/binding/GameManager.hpp>
 #include <Geode/binding/GJGroundLayer.hpp>
 #include <Geode/utils/cocos.hpp>
