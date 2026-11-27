@@ -236,7 +236,9 @@ class $modify(ScaledUI, EditorUI) {
 
         // Make the builds tabs be center-aligned
         auto winSize = CCDirector::get()->getWinSize();
-        this->getChildByID("build-tabs-menu")->setPositionX(winSize.width / 2);
+        if (auto buildTabs = this->getChildByID("build-tabs-menu")) {
+            buildTabs->setPositionX(winSize.width / 2);
+        }
 
         return true;
     }
