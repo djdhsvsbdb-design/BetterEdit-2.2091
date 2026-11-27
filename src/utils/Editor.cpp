@@ -205,7 +205,6 @@ class $modify(HideUI, EditorUI) {
         EditorUI::showUI(show);
         UIShowEvent(this).send(show);
 
-        m_tabsMenu->setVisible(show && m_selectedMode == 2);
     }
 };
 
