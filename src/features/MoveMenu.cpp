@@ -277,7 +277,7 @@ public:
 
         this_group_has_already_been_handled_fully_before:;
         }
-        editBar->getAllItems()->removeAllObjects();
+        editBar->getItems()->removeAllObjects();
 
         // Group up move buttons
         for (auto [modID, group] : std::move(groups)) {
@@ -380,4 +380,4 @@ class $modify(MoreButtonsUI, EditorUI) {
         EditorUI::resetUI();
         if (auto menu = CustomEditMenu::get(this)) menu->updateMenu();
     }
-}
+};
