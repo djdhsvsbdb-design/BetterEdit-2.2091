@@ -6,6 +6,7 @@
 #include <Geode/modify/LevelEditorLayer.hpp>
 #include <Geode/binding/GameObject.hpp>
 #include <Geode/binding/EffectGameObject.hpp>
+#include <alphalaneous.editortab_api/API.hpp>
 #include <utils/Warn.hpp>
 
 std::vector<GameObject*> be::getSelectedObjects(EditorUI* ui) {
@@ -83,6 +84,19 @@ class $modify(EditorUI) {
         (void)self.setHookPriority("EditorUI::showUI", -100);
     }
 
+    void hideEditorTabModes() {
+        for (auto const& tab : alpha::editor_tabs::getAllTabs()) {
+            if (auto node = tab->getNode()) {
+                node->setVisible(false);
+            }
+        }
+        // EditorTab API replaces this menu with its mode/tab selector but keeps
+        // the EditorUI field pointing at the replacement TabMenu.
+        if (m_tabsMenu) {
+            m_tabsMenu->setVisible(false);
+        }
+    }
+
     $override
     void clickOnPosition(CCPoint pos) {
         if (!be::isViewOnlyEditor(m_editorLayer)) {
@@ -96,13 +110,16 @@ class $modify(EditorUI) {
             show = false;
         }
         EditorUI::showUI(show);
+        if (be::isViewOnlyEditor(m_editorLayer)) {
+            this->hideEditorTabModes();
+        }
     }
     $override
     void toggleMode(CCObject* sender) {
         EditorUI::toggleMode(sender);
         if (be::isViewOnlyEditor(m_editorLayer)) {
             // A mode switch may show a different mode after the base handler.
-            this->showUI(false);
+            this->hideEditorTabModes();
         }
     }
 
@@ -112,8 +129,7 @@ class $modify(EditorUI) {
         auto playbackMode = m_editorLayer->m_playbackMode;
         EditorUI::onPlaytest(sender);
         if (!m_isPaused && playbackMode != PlaybackMode::Playing && be::isViewOnlyEditor(m_editorLayer)) {
-            // A mode switch may show a different mode after the base handler.
-            this->showUI(false);
+            this->hideEditorTabModes();
         }
     }
     #endif
