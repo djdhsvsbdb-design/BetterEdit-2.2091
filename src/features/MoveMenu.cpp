@@ -322,13 +322,13 @@ public:
 
 class $modify(MoreButtonsUI, EditorUI) {
     struct Fields {
-        ListenerHandle onTabsInitialized;
+        ListenerHandle onMoveMenuSetup;
+        ListenerHandle onEditTabLoaded;
         ListenerHandle onModeSwitch;
     };
 
-    void setupBetterEditMoveMenu() {
+    void setupBetterEditMoveMenu(alpha::editor_tabs::Tab* editTab) {
         auto editMode = alpha::editor_tabs::getMode(alpha::editor_tabs::Edit);
-        auto editTab = editMode ? editMode->getTab("edit") : nullptr;
         auto editBar = editTab ? editTab->getNode() : nullptr;
         if (!editBar) {
             log::error("BetterEdit: EditorTab API Edit tab is unavailable after initialization");
@@ -350,6 +350,9 @@ class $modify(MoreButtonsUI, EditorUI) {
         editBar->reloadAllItems();
 
         (void)CustomEditMenu::get(this, true);
+        m_fields->onEditTabLoaded = alpha::editor_tabs::Tab::TabLoadedEvent(editTab).listen([this](alpha::editor_tabs::EditorTab*) {
+            if (auto menu = CustomEditMenu::get(this)) menu->updateMenu();
+        });
         m_fields->onModeSwitch = alpha::editor_tabs::Mode::SwitchModeEvent(editMode).listen([this](bool show) {
             if (auto menu = CustomEditMenu::get(this)) menu->updateMenu(show);
         });
@@ -357,8 +360,11 @@ class $modify(MoreButtonsUI, EditorUI) {
 
     $override
     bool init(LevelEditorLayer* editor) {
-        m_fields->onTabsInitialized = alpha::editor_tabs::AllTabsInitializedEvent().listen([this]() {
-            this->setupBetterEditMoveMenu();
+        // EditorTab API emits this after it has constructed the real Edit tab,
+        // including the Android D-pad layout. Use the event's tab rather than
+        // assuming the old EditButtonBar is still attached to EditorUI.
+        m_fields->onMoveMenuSetup = alpha::editor_tabs::SetupMoveMenuEvent().listen([this](alpha::editor_tabs::Tab* editTab) {
+            this->setupBetterEditMoveMenu(editTab);
         });
         if (!EditorUI::init(editor)) return false;
         return true;
