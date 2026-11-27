@@ -1,4 +1,3 @@
-#include <Geode/modify/EditButtonBar.hpp>
 #include <Geode/modify/EditorUI.hpp>
 #include <Geode/binding/CCMenuItemSpriteExtra.hpp>
 #include <Geode/binding/GameManager.hpp>
