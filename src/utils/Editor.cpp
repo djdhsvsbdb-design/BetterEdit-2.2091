@@ -4,7 +4,6 @@
 #include <Geode/modify/EditorUI.hpp>
 #include <Geode/modify/EditorPauseLayer.hpp>
 #include <Geode/modify/LevelEditorLayer.hpp>
-#include <Geode/binding/EditButtonBar.hpp>
 #include <Geode/binding/GameObject.hpp>
 #include <Geode/binding/EffectGameObject.hpp>
 #include <utils/Warn.hpp>
@@ -93,8 +92,8 @@ class $modify(EditorUI) {
     $override
     void showUI(bool show) {
         if (be::isViewOnlyEditor(m_editorLayer)) {
+            // EditorTab API owns active mode/tab visibility.
             show = false;
-            m_tabsMenu->setVisible(false);
         }
         EditorUI::showUI(show);
     }
@@ -102,10 +101,8 @@ class $modify(EditorUI) {
     void toggleMode(CCObject* sender) {
         EditorUI::toggleMode(sender);
         if (be::isViewOnlyEditor(m_editorLayer)) {
-            m_editButtonBar->setVisible(false);
-            m_createButtonBar->setVisible(false);
-            m_deleteMenu->setVisible(false);
-            m_tabsMenu->setVisible(false);
+            // A mode switch may show a different mode after the base handler.
+            this->showUI(false);
         }
     }
 
@@ -115,10 +112,8 @@ class $modify(EditorUI) {
         auto playbackMode = m_editorLayer->m_playbackMode;
         EditorUI::onPlaytest(sender);
         if (!m_isPaused && playbackMode != PlaybackMode::Playing && be::isViewOnlyEditor(m_editorLayer)) {
-            m_editButtonBar->setVisible(false);
-            m_createButtonBar->setVisible(false);
-            m_deleteMenu->setVisible(false);
-            m_tabsMenu->setVisible(false);
+            // A mode switch may show a different mode after the base handler.
+            this->showUI(false);
         }
     }
     #endif
