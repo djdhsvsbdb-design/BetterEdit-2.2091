@@ -197,8 +197,16 @@ public:
     }
 
     void updateMenu(bool show = true) {
+        // EditorTab API may replace the normal EditButtonBar with its dpad editor.
+        // In that case BetterEdit's custom move menu has no bar to manage.
+        auto editButtonBar = m_editorUI ? m_editorUI->m_editButtonBar : nullptr;
+        if (!editButtonBar || !editButtonBar->m_buttonArray) {
+            this->setVisible(false);
+            return;
+        }
+
         // Hide the original
-        m_editorUI->m_editButtonBar->setVisible(false);
+        editButtonBar->setVisible(false);
 
         // If we're not showing, we don't need to update the menu layout, just return
         auto editMode = alpha::editor_tabs::getMode(alpha::editor_tabs::Edit);
@@ -221,7 +229,7 @@ public:
         };
         
         // Move all buttons from the normal edit button bar to this one
-        for (auto btn : CCArrayExt<CCMenuItemSpriteExtra*>(m_editorUI->m_editButtonBar->m_buttonArray)) {
+        for (auto btn : CCArrayExt<CCMenuItemSpriteExtra*>(editButtonBar->m_buttonArray)) {
             auto ref = Ref(btn);
             btn->removeFromParent();
 
@@ -271,7 +279,7 @@ public:
 
         this_group_has_already_been_handled_fully_before:;
         }
-        m_editorUI->m_editButtonBar->m_buttonArray->removeAllObjects();
+        editButtonBar->m_buttonArray->removeAllObjects();
 
         // Group up move buttons
         for (auto [modID, group] : std::move(groups)) {
@@ -310,7 +318,7 @@ public:
         m_bottomRow->updateLayout();
 
         this->setVisible(true);
-        this->setScale(m_editorUI->m_editButtonBar->getScale());
+        this->setScale(editButtonBar->getScale());
     }
 };
 
@@ -326,6 +334,12 @@ class $modify(MoreButtonsUI, EditorUI) {
         
         // The reason this is all done in init() rather than createMoveMenu() 
         // is that we want NodeIDs to have added the IDs first
+
+        // Some EditorTab API configurations use a dpad node instead of an EditButtonBar.
+        if (!m_editButtonBar || !m_editButtonBar->m_buttonArray) {
+            log::warn("BetterEdit: skipping custom move menu because no EditButtonBar is available");
+            return true;
+        }
 
         this->addMoveButton("move-up-quarter-button"_spr,    "edit_upBtn5_001.png",    EditCommandExt::QuarterUp);
         this->addMoveButton("move-down-quarter-button"_spr,  "edit_downBtn5_001.png",  EditCommandExt::QuarterDown);
@@ -362,6 +376,7 @@ class $modify(MoreButtonsUI, EditorUI) {
     }
 
     void addMoveButton(const char* id, const char* spr, EditCommand command) {
+        if (!m_editButtonBar || !m_editButtonBar->m_buttonArray) return;
         auto btn = this->getSpriteButton(spr, menu_selector(MoreButtonsUI::onMyMoveObject), nullptr, .9f);
         btn->setID(id);
         btn->setTag(static_cast<int>(command));
