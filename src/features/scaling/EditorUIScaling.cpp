@@ -234,9 +234,12 @@ class $modify(ScaledUI, EditorUI) {
             }
         }
 
-        // Make the builds tabs be center-aligned
+        // Make the build tabs be center-aligned when the menu exists.
+        // Editor Tab API can replace or temporarily omit the original menu.
         auto winSize = CCDirector::get()->getWinSize();
-        this->getChildByID("build-tabs-menu")->setPositionX(winSize.width / 2);
+        if (auto buildTabsMenu = this->getChildByID("build-tabs-menu")) {
+            buildTabsMenu->setPositionX(winSize.width / 2);
+        }
 
         return true;
     }
